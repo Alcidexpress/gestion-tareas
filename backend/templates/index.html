@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+      <title>FlowDays Work Calendar - Gestión de Turnos Laborales</title>
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+</head>
+<body>
+  <div class="container">
+    <!-- Header -->
+    <div class="header">
+      <h1><i class="fas fa-briefcase"></i> FlowDays Work Calendar</h1>
+      <p>Gestión de Turnos Laborales - Organiza tus tareas, Recuerda, Actúa</p>
+    </div>
+
+    <!-- Dashboard con estadísticas completas -->
+    <div class="stats-section">
+      <div class="stat-card">
+        <i class="fas fa-tasks"></i>
+        <div class="stat-number" id="today-tasks">0</div>
+        <div class="stat-label">Tareas Hoy</div>
+      </div>
+      <div class="stat-card">
+        <i class="fas fa-briefcase"></i>
+        <div class="stat-number" id="today-shifts">0</div>
+        <div class="stat-label">Turnos Hoy</div>
+      </div>
+      <div class="stat-card">
+        <i class="fas fa-clock"></i>
+        <div class="stat-number" id="week-hours">0h</div>
+        <div class="stat-label">Horas Semana</div>
+      </div>
+      <div class="stat-card">
+        <i class="fas fa-calendar-week"></i>
+        <div class="stat-number" id="month-hours">0h</div>
+        <div class="stat-label">Horas Mes</div>
+      </div>
+    </div>
+
+    <!-- Contenido Principal -->
+    <div class="main-content">
+      <!-- Calendario -->
+      <div class="calendar-section">
+        <div class="calendar-header">
+          <button id="prev-month" class="btn btn-secondary">
+            <i class="fas fa-chevron-left"></i>
+          </button>
+          <h2 id="current-month">Diciembre 2024</h2>
+          <button id="next-month" class="btn btn-secondary">
+            <i class="fas fa-chevron-right"></i>
+          </button>
+        </div>
+        
+        <div class="calendar-grid">
+          <div class="calendar-weekdays">
+            <div>Dom</div>
+            <div>Lun</div>
+            <div>Mar</div>
+            <div>Mié</div>
+            <div>Jue</div>
+            <div>Vie</div>
+            <div>Sáb</div>
+          </div>
+          <div id="calendar-days" class="calendar-days">
+            <!-- Los días se generarán dinámicamente -->
+          </div>
+        </div>
+      </div>
+
+      <!-- Formularios de Gestión -->
+      <div class="forms-container">
+        <!-- Formulario para nueva tarea -->
+        <div class="card">
+          <h2><i class="fas fa-tasks"></i> Nueva Tarea</h2>
+          <form id="task-form" class="task-form">
+            <div class="form-group">
+              <label for="task-title">Título:</label>
+              <input type="text" id="task-title" name="task-title" required placeholder="Título de la tarea">
+            </div>
+            <div class="form-group">
+              <label for="task-description">Descripción:</label>
+              <textarea id="task-description" name="task-description" rows="3" placeholder="Descripción detallada de la tarea"></textarea>
+            </div>
+            <div class="form-row">
+              <div class="form-group">
+                <label for="task-date">Fecha:</label>
+                <input type="date" id="task-date" name="task-date" required>
+              </div>
+              <div class="form-group">
+                <label for="task-time">Hora (opcional):</label>
+                <input type="time" id="task-time" name="task-time">
+              </div>
+            </div>
+            <div class="form-row">
+              <div class="form-group">
+                <label for="task-priority">Prioridad:</label>
+                <select id="task-priority" name="task-priority" required>
+                  <option value="">Seleccionar prioridad</option>
+                  <option value="alta">Alta</option>
+                  <option value="media">Media</option>
+                  <option value="baja">Baja</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label for="task-location">Ubicación:</label>
+                <input type="text" id="task-location" name="task-location" placeholder="Lugar de la tarea">
+              </div>
+            </div>
+            
+            <!-- Configuración de recordatorios -->
+            <div class="reminder-section">
+              <h3><i class="fas fa-bell"></i> Recordatorios</h3>
+              <div class="form-row">
+                <div class="form-group">
+                  <label for="task-reminder-type">Tipo:</label>
+                  <select id="task-reminder-type" name="task-reminder-type">
+                    <option value="none">Sin recordatorio</option>
+                    <option value="email">Email</option>
+                    <option value="push">Notificación push</option>
+                  </select>
+                </div>
+                <div class="form-group">
+                  <label for="task-reminder-before">Recordar:</label>
+                  <select id="task-reminder-before" name="task-reminder-before">
+                    <option value="0">Sin recordatorio</option>
+                    <option value="5">5 minutos antes</option>
+                    <option value="15">15 minutos antes</option>
+                    <option value="30">30 minutos antes</option>
+                    <option value="60">1 hora antes</option>
+                    <option value="1440">1 día antes</option>
+                  </select>
+                </div>
+              </div>
+            </div>
+            
+            <button type="submit" class="btn btn-primary">
+              <i class="fas fa-plus"></i> Crear Tarea
+            </button>
+          </form>
+        </div>
+
+        <!-- Formulario para nuevo turno -->
+        <div class="card">
+          <h2><i class="fas fa-briefcase"></i> Nuevo Turno</h2>
+          <form id="shift-form" class="shift-form">
+            <div class="form-row">
+              <div class="form-group">
+                <label for="shift-date">Fecha:</label>
+                <input type="date" id="shift-date" name="shift-date" required>
+              </div>
+              <div class="form-group">
+                <label for="shift-type">Tipo de Turno:</label>
+                <select id="shift-type" name="shift-type" required>
+                  <option value="">Seleccionar turno</option>
+                  <option value="M">M - Mañana</option>
+                  <option value="T">T - Tarde</option>
+                  <option value="N">N - Noche</option>
+                  <option value="F">F - Festivo</option>
+                  <option value="L">L - Libre</option>
+                  <option value="V">V - Vacaciones</option>
+                </select>
+              </div>
+            </div>
+            <div class="form-row">
+              <div class="form-group">
+                <label for="shift-start">Hora de Inicio:</label>
+                <input type="time" id="shift-start" name="shift-start">
+              </div>
+              <div class="form-group">
+                <label for="shift-end">Hora de Fin:</label>
+                <input type="time" id="shift-end" name="shift-end">
+              </div>
+            </div>
+            <div class="form-group">
+              <label for="shift-notes">Notas:</label>
+              <textarea id="shift-notes" name="shift-notes" rows="3" placeholder="Notas adicionales del turno"></textarea>
+            </div>
+            
+            <button type="submit" class="btn btn-primary">
+              <i class="fas fa-plus"></i> Crear Turno
+            </button>
+          </form>
+        </div>
+      </div>
+
+      <!-- Elementos del día seleccionado -->
+      <div class="day-elements-container">
+        <!-- Lista de tareas del día -->
+        <div class="card">
+          <h2><i class="fas fa-tasks"></i> Tareas del Día</h2>
+          <div class="element-counter" id="task-counter">0 tareas</div>
+          <ul id="task-list" class="task-list">
+            <!-- Las tareas se cargarán dinámicamente aquí -->
+          </ul>
+        </div>
+
+        <!-- Lista de turnos del día -->
+        <div class="card">
+          <h2><i class="fas fa-briefcase"></i> Turnos del Día</h2>
+          <div class="element-counter" id="shift-counter">0 turnos</div>
+          <ul id="shift-list" class="shift-list">
+            <!-- Los turnos se cargarán dinámicamente aquí -->
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Chatbot flotante Izán Bot -->
+  <div id="chat-widget" class="chat-widget">
+    <div id="chat-header" class="chat-header">
+      <div class="chat-avatar">
+        <i class="fas fa-robot"></i>
+      </div>
+      <div class="chat-info">
+        <span class="chat-title">Izán Bot</span>
+        <span class="chat-subtitle">Asistente IA</span>
+      </div>
+      <button id="chat-toggle" class="chat-toggle">
+        <i class="fas fa-minus"></i>
+      </button>
+    </div>
+    <div id="chat-body" class="chat-body">
+              <div id="chat-messages" class="chat-messages">
+          <div class="message bot">
+            <strong>Izán Bot:</strong> ¡Hola! Soy Izán, tu asistente personal de FlowDays. ¿En qué puedo ayudarte hoy? Puedo responder preguntas sobre tus tareas, darte consejos de productividad, o ayudarte a gestionar tu lista de tareas.
+          </div>
+        </div>
+
+      <div class="typing-indicator" id="typing-indicator">
+        <div class="typing-dots">
+          <div class="typing-dot"></div>
+          <div class="typing-dot"></div>
+          <div class="typing-dot"></div>
+        </div>
+      </div>
+
+      <div class="chat-input-container">
+        <input type="text" id="user-input" class="chat-input" placeholder="Escribe tu mensaje aquí..." maxlength="500">
+        <button id="send-button" class="send-btn">
+          <i class="fas fa-paper-plane"></i>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <script src="{{ url_for('static', filename='app.js') }}"></script>
+</body>
+</html>

@@ -1,0 +1,666 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>TaskMaster Pro - Gestor de Tareas Inteligente</title>
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link href="styles.css" rel="stylesheet">
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Poppins', sans-serif;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      min-height: 100vh;
+      color: #333;
+    }
+
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 20px;
+    }
+
+    .header {
+      text-align: center;
+      margin-bottom: 30px;
+      animation: fadeInDown 1s ease-out;
+    }
+
+    .header h1 {
+      font-size: 3rem;
+      color: white;
+      margin-bottom: 10px;
+      text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+    }
+
+    .header p {
+      font-size: 1.2rem;
+      color: rgba(255,255,255,0.9);
+    }
+
+    .main-content {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 30px;
+      margin-bottom: 30px;
+    }
+
+    .card {
+      background: white;
+      border-radius: 20px;
+      padding: 30px;
+      box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
+      animation: fadeInUp 1s ease-out;
+    }
+
+    .card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 25px 50px rgba(0,0,0,0.15);
+    }
+
+    .card h2 {
+      color: #667eea;
+      margin-bottom: 20px;
+      font-size: 1.8rem;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .task-form {
+      display: flex;
+      flex-direction: column;
+      gap: 15px;
+    }
+
+    .form-group {
+      display: flex;
+      flex-direction: column;
+      gap: 5px;
+    }
+
+    .form-group label {
+      font-weight: 500;
+      color: #555;
+    }
+
+    .form-group input,
+    .form-group select {
+      padding: 12px;
+      border: 2px solid #e1e5e9;
+      border-radius: 10px;
+      font-size: 1rem;
+      transition: border-color 0.3s ease;
+    }
+
+    .form-group input:focus,
+    .form-group select:focus {
+      outline: none;
+      border-color: #667eea;
+    }
+
+    .btn {
+      padding: 12px 24px;
+      border: none;
+      border-radius: 10px;
+      font-size: 1rem;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .btn-primary {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+    }
+
+    .btn-primary:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 10px 20px rgba(102, 126, 234, 0.3);
+    }
+
+    .btn-success {
+      background: #28a745;
+      color: white;
+    }
+
+    .btn-danger {
+      background: #dc3545;
+      color: white;
+    }
+
+    .btn-warning {
+      background: #ffc107;
+      color: #333;
+    }
+
+    .task-list {
+      list-style: none;
+      max-height: 400px;
+      overflow-y: auto;
+    }
+
+    .task-item {
+      background: #f8f9fa;
+      margin-bottom: 10px;
+      padding: 15px;
+      border-radius: 10px;
+      border-left: 4px solid #667eea;
+      transition: all 0.3s ease;
+      animation: slideInRight 0.5s ease-out;
+    }
+
+    .task-item:hover {
+      background: #e9ecef;
+      transform: translateX(5px);
+    }
+
+    .task-item.completada {
+      opacity: 0.7;
+      border-left-color: #28a745;
+      text-decoration: line-through;
+    }
+
+    .task-item.alta {
+      border-left-color: #dc3545;
+    }
+
+    .task-item.media {
+      border-left-color: #ffc107;
+    }
+
+    .task-item.baja {
+      border-left-color: #28a745;
+    }
+
+    .task-content {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 10px;
+    }
+
+    .task-title {
+      font-weight: 500;
+      flex: 1;
+    }
+
+    .task-priority {
+      padding: 4px 8px;
+      border-radius: 15px;
+      font-size: 0.8rem;
+      font-weight: 500;
+    }
+
+    .priority-alta {
+      background: #f8d7da;
+      color: #721c24;
+    }
+
+    .priority-media {
+      background: #fff3cd;
+      color: #856404;
+    }
+
+    .priority-baja {
+      background: #d4edda;
+      color: #155724;
+    }
+
+    .task-actions {
+      display: flex;
+      gap: 5px;
+    }
+
+    .task-actions button {
+      padding: 6px 12px;
+      border: none;
+      border-radius: 5px;
+      font-size: 0.8rem;
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+
+    .task-actions button:hover {
+      transform: scale(1.05);
+    }
+
+    .chat-section {
+      grid-column: 1 / -1;
+    }
+
+    .chat-container {
+      background: white;
+      border-radius: 20px;
+      padding: 30px;
+      box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+      animation: fadeInUp 1s ease-out 0.5s both;
+    }
+
+    .chat-header {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 20px;
+    }
+
+    .chat-avatar {
+      width: 40px;
+      height: 40px;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: white;
+      font-size: 1.2rem;
+    }
+
+    .chat-messages {
+      height: 300px;
+      overflow-y: auto;
+      padding: 15px;
+      background: #f8f9fa;
+      border-radius: 10px;
+      margin-bottom: 20px;
+    }
+
+    .message {
+      margin-bottom: 15px;
+      padding: 10px 15px;
+      border-radius: 15px;
+      max-width: 80%;
+      animation: fadeIn 0.5s ease-out;
+    }
+
+    .message.user {
+      background: #667eea;
+      color: white;
+      margin-left: auto;
+      border-bottom-right-radius: 5px;
+    }
+
+    .message.bot {
+      background: white;
+      color: #333;
+      border: 1px solid #e1e5e9;
+      border-bottom-left-radius: 5px;
+    }
+
+    .message.error {
+      background: #f8d7da;
+      color: #721c24;
+      border: 1px solid #f5c6cb;
+    }
+
+    .chat-input-container {
+      display: flex;
+      gap: 10px;
+    }
+
+    .chat-input {
+      flex: 1;
+      padding: 12px;
+      border: 2px solid #e1e5e9;
+      border-radius: 25px;
+      font-size: 1rem;
+      transition: border-color 0.3s ease;
+    }
+
+    .chat-input:focus {
+      outline: none;
+      border-color: #667eea;
+    }
+
+    .send-btn {
+      padding: 12px 20px;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      border: none;
+      border-radius: 25px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+
+    .send-btn:hover {
+      transform: scale(1.05);
+    }
+
+    .stats-section {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 20px;
+      margin-bottom: 30px;
+    }
+
+    .stat-card {
+      background: white;
+      padding: 20px;
+      border-radius: 15px;
+      text-align: center;
+      box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+      transition: transform 0.3s ease;
+      animation: fadeInUp 1s ease-out 0.3s both;
+    }
+
+    .stat-card:hover {
+      transform: translateY(-5px);
+    }
+
+    .stat-number {
+      font-size: 2.5rem;
+      font-weight: 700;
+      color: #667eea;
+      margin-bottom: 5px;
+    }
+
+    .stat-label {
+      color: #666;
+      font-size: 0.9rem;
+    }
+
+    .loading {
+      display: inline-block;
+      width: 20px;
+      height: 20px;
+      border: 3px solid #f3f3f3;
+      border-top: 3px solid #667eea;
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+    }
+
+    @keyframes fadeInDown {
+      from {
+        opacity: 0;
+        transform: translateY(-30px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    @keyframes fadeInUp {
+      from {
+        opacity: 0;
+        transform: translateY(30px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    @keyframes slideInRight {
+      from {
+        opacity: 0;
+        transform: translateX(30px);
+      }
+      to {
+        opacity: 1;
+        transform: translateX(0);
+      }
+    }
+
+    @keyframes fadeIn {
+      from {
+        opacity: 0;
+      }
+      to {
+        opacity: 1;
+      }
+    }
+
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+
+    .typing-indicator {
+      display: none;
+      padding: 10px 15px;
+      background: white;
+      border-radius: 15px;
+      border: 1px solid #e1e5e9;
+      margin-bottom: 15px;
+      border-bottom-left-radius: 5px;
+    }
+
+    .typing-dots {
+      display: flex;
+      gap: 4px;
+    }
+
+    .typing-dot {
+      width: 8px;
+      height: 8px;
+      background: #667eea;
+      border-radius: 50%;
+      animation: typing 1.4s infinite ease-in-out;
+    }
+
+    .typing-dot:nth-child(1) { animation-delay: -0.32s; }
+    .typing-dot:nth-child(2) { animation-delay: -0.16s; }
+
+    @keyframes typing {
+      0%, 80%, 100% {
+        transform: scale(0.8);
+        opacity: 0.5;
+      }
+      40% {
+        transform: scale(1);
+        opacity: 1;
+      }
+    }
+
+    @media (max-width: 768px) {
+      .main-content {
+        grid-template-columns: 1fr;
+      }
+      
+      .header h1 {
+        font-size: 2rem;
+      }
+      
+      .stats-section {
+        grid-template-columns: repeat(2, 1fr);
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <!-- Header -->
+    <div class="header">
+      <h1><i class="fas fa-tasks"></i> TaskMaster Pro</h1>
+      <p>Tu asistente inteligente para gestionar tareas</p>
+    </div>
+
+    <!-- Estadísticas -->
+    <div class="stats-section">
+      <div class="stat-card">
+        <div class="stat-number" id="total-tasks">0</div>
+        <div class="stat-label">Total Tareas</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-number" id="completed-tasks">0</div>
+        <div class="stat-label">Completadas</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-number" id="pending-tasks">0</div>
+        <div class="stat-label">Pendientes</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-number" id="high-priority">0</div>
+        <div class="stat-label">Alta Prioridad</div>
+      </div>
+    </div>
+
+    <!-- Contenido Principal -->
+    <div class="main-content">
+      <!-- Formulario de Tareas -->
+      <div class="card">
+        <h2><i class="fas fa-plus-circle"></i> Nueva Tarea</h2>
+        <form id="task-form" class="task-form">
+          <div class="form-group">
+            <label for="title">Título de la tarea</label>
+            <input type="text" id="title" placeholder="¿Qué necesitas hacer?" required>
+          </div>
+          <div class="form-group">
+            <label for="priority">Prioridad</label>
+            <select id="priority" required>
+              <option value="">Selecciona prioridad</option>
+              <option value="alta">Alta</option>
+              <option value="media">Media</option>
+              <option value="baja">Baja</option>
+            </select>
+          </div>
+          <button type="submit" class="btn btn-primary">
+            <i class="fas fa-save"></i> Crear Tarea
+          </button>
+        </form>
+      </div>
+
+      <!-- Lista de Tareas -->
+      <div class="card">
+        <h2><i class="fas fa-list-check"></i> Mis Tareas</h2>
+        <ul id="task-list" class="task-list"></ul>
+      </div>
+    </div>
+
+    <!-- Chat con IA -->
+    <div class="chat-section">
+      <div class="chat-container">
+        <div class="chat-header">
+          <div class="chat-avatar">
+            <i class="fas fa-robot"></i>
+          </div>
+          <div>
+            <h2>Asistente IA</h2>
+            <p>Pregúntame sobre tus tareas o cualquier cosa</p>
+          </div>
+        </div>
+        
+        <div id="chat-messages" class="chat-messages">
+          <div class="message bot">
+            <strong>Asistente IA:</strong> ¡Hola! Soy tu asistente personal. ¿En qué puedo ayudarte hoy? Puedo responder preguntas sobre tus tareas, darte consejos de productividad, o simplemente charlar contigo.
+          </div>
+        </div>
+
+        <div class="typing-indicator" id="typing-indicator">
+          <div class="typing-dots">
+            <div class="typing-dot"></div>
+            <div class="typing-dot"></div>
+            <div class="typing-dot"></div>
+          </div>
+        </div>
+
+        <div class="chat-input-container">
+          <input type="text" id="user-input" class="chat-input" placeholder="Escribe tu mensaje aquí..." maxlength="500">
+          <button id="send-button" class="send-btn">
+            <i class="fas fa-paper-plane"></i>
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="app.js"></script>
+  <script>
+    // Funcionalidad del chat
+    const chatMessages = document.getElementById("chat-messages");
+    const userInput = document.getElementById("user-input");
+    const sendButton = document.getElementById("send-button");
+    const typingIndicator = document.getElementById("typing-indicator");
+
+    function addMessage(content, type = 'bot') {
+      const messageDiv = document.createElement('div');
+      messageDiv.className = `message ${type}`;
+      messageDiv.innerHTML = content;
+      chatMessages.appendChild(messageDiv);
+      chatMessages.scrollTop = chatMessages.scrollHeight;
+    }
+
+    function showTyping() {
+      typingIndicator.style.display = 'block';
+      chatMessages.scrollTop = chatMessages.scrollHeight;
+    }
+
+    function hideTyping() {
+      typingIndicator.style.display = 'none';
+    }
+
+    async function sendMessage() {
+      const message = userInput.value.trim();
+      if (!message) return;
+
+      // Mostrar mensaje del usuario
+      addMessage(`<strong>Tú:</strong> ${message}`, 'user');
+      userInput.value = '';
+
+      // Mostrar indicador de escritura
+      showTyping();
+
+      try {
+        const response = await fetch("http://localhost:5000/api/chat/send", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json"
+          },
+          body: JSON.stringify({ message })
+        });
+
+        const data = await response.json();
+        hideTyping();
+
+        if (data.reply) {
+          addMessage(`<strong>Asistente IA:</strong> ${data.reply}`, 'bot');
+        } else {
+          addMessage(`<strong>Error:</strong> No se recibió respuesta válida`, 'error');
+        }
+      } catch (error) {
+        hideTyping();
+        addMessage(`<strong>Error:</strong> ${error.message}`, 'error');
+      }
+    }
+
+    sendButton.addEventListener('click', sendMessage);
+    userInput.addEventListener('keypress', (e) => {
+      if (e.key === 'Enter') {
+        sendMessage();
+      }
+    });
+
+    // Actualizar estadísticas
+    function updateStats() {
+      const tasks = Array.from(document.querySelectorAll('.task-item'));
+      const completed = tasks.filter(task => task.classList.contains('completada')).length;
+      const highPriority = tasks.filter(task => task.classList.contains('alta')).length;
+      
+      document.getElementById('total-tasks').textContent = tasks.length;
+      document.getElementById('completed-tasks').textContent = completed;
+      document.getElementById('pending-tasks').textContent = tasks.length - completed;
+      document.getElementById('high-priority').textContent = highPriority;
+    }
+
+    // Observar cambios en la lista de tareas para actualizar estadísticas
+    const taskList = document.getElementById('task-list');
+    const observer = new MutationObserver(updateStats);
+    observer.observe(taskList, { childList: true, subtree: true, attributes: true });
+
+    // Actualizar estadísticas iniciales
+    setTimeout(updateStats, 1000);
+  </script>
+</body>
+</html>
